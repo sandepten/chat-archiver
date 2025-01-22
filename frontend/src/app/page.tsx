@@ -46,9 +46,17 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Button asChild>
-                  <Link href="#login">Get Started</Link>
-                </Button>
+                <SignedOut>
+                  <Button asChild>
+                    {/* <Link href="#login">Get Started</Link> */}
+                    <p>Get Started</p>
+                  </Button>
+                </SignedOut>
+                <SignedIn>
+                  <Button asChild>
+                    <Link href="/dashboard">Dashboard</Link>
+                  </Button>
+                </SignedIn>
                 <Button variant="outline" asChild>
                   <Link href="#how-it-works">Learn More</Link>
                 </Button>
@@ -119,38 +127,6 @@ export default function LandingPage() {
                 </p>
               </li>
             </ol>
-          </div>
-        </section>
-        <section
-          id="login"
-          className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800"
-        >
-          <div className="px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  Get Started Today
-                </h2>
-                <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
-                  Join thousands of users who trust ChatArchiver to preserve
-                  their digital conversations.
-                </p>
-              </div>
-              <div className="space-y-2 space-x-2">
-                <Button className="w-full sm:w-auto" asChild>
-                  <Link href="/api/auth/login">
-                    <Github className="mr-2 size-4" />
-                    Sign up with Google
-                  </Link>
-                </Button>
-                <Button className="w-full sm:w-auto" asChild>
-                  <Link href="/api/auth/login">
-                    <Github className="mr-2 size-4" />
-                    Sign up with GitHub
-                  </Link>
-                </Button>
-              </div>
-            </div>
           </div>
         </section>
       </main>
