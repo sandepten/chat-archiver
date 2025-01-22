@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Github, Upload, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 export default function LandingPage() {
   return (
@@ -23,12 +24,12 @@ export default function LandingPage() {
           >
             How It Works
           </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            href="#login"
-          >
-            Login
-          </Link>
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
         </nav>
       </header>
       <main className="flex-1">
@@ -135,15 +136,18 @@ export default function LandingPage() {
                   their digital conversations.
                 </p>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 space-x-2">
                 <Button className="w-full sm:w-auto" asChild>
                   <Link href="/api/auth/login">
-                    <Github className="mr-2 h-4 w-4" />
-                    Sign up with GitHub
+                    <Github className="mr-2 size-4" />
+                    Sign up with Google
                   </Link>
                 </Button>
-                <Button className="w-full sm:w-auto" variant="outline" asChild>
-                  <Link href="/api/auth/login">Sign up with Google</Link>
+                <Button className="w-full sm:w-auto" asChild>
+                  <Link href="/api/auth/login">
+                    <Github className="mr-2 size-4" />
+                    Sign up with GitHub
+                  </Link>
                 </Button>
               </div>
             </div>
