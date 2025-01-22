@@ -1,20 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Search, LogOut } from "lucide-react";
+import { Plus, Search, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { DeleteChatDialog } from "@/components/delete-chat-dialog";
 import { SignedIn, UserButton } from "@clerk/nextjs";
+import Link from "next/link";
 
 // Mock data for chats
 const mockChats = [
@@ -24,6 +17,7 @@ const mockChats = [
     lastMessage: "Mom: Don't forget the picnic on Sunday!",
     participants: 5,
     messages: 1420,
+    color: "bg-pink-500",
   },
   {
     id: 2,
@@ -31,6 +25,7 @@ const mockChats = [
     lastMessage: "Boss: Great job on the project, team!",
     participants: 8,
     messages: 3250,
+    color: "bg-blue-500",
   },
   {
     id: 3,
@@ -38,6 +33,7 @@ const mockChats = [
     lastMessage: "Alice: Who's up for movie night?",
     participants: 4,
     messages: 10503,
+    color: "bg-purple-500",
   },
   {
     id: 4,
@@ -45,6 +41,7 @@ const mockChats = [
     lastMessage: "John: I loved the twist ending!",
     participants: 6,
     messages: 952,
+    color: "bg-green-500",
   },
   {
     id: 5,
@@ -52,6 +49,7 @@ const mockChats = [
     lastMessage: "You: I found some great hotel deals!",
     participants: 3,
     messages: 728,
+    color: "bg-yellow-500",
   },
   {
     id: 6,
@@ -59,6 +57,7 @@ const mockChats = [
     lastMessage: "Sarah: New personal record at the gym today!",
     participants: 5,
     messages: 1893,
+    color: "bg-red-500",
   },
 ];
 
@@ -94,56 +93,85 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center justify-between border-b">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold">ChatArchiver</h1>
-          <Input
-            type="search"
-            placeholder="Search chats..."
-            className="w-[300px]"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="flex items-center space-x-4">
-          <Button onClick={handleImport}>
-            <Plus className="mr-2 h-4 w-4" /> Import Chat
-          </Button>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
+    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+      <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-md">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Link href="/" className="flex items-center space-x-2">
+              <MessageSquare className="h-8 w-8 text-primary" />
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                ChatArchiver
+              </h1>
+            </Link>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Input
+                type="search"
+                placeholder="Search chats..."
+                className="pl-10 w-64"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Button onClick={handleImport}>
+              <Plus className="mr-2 h-4 w-4" /> Import Chat
+            </Button>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </div>
         </div>
       </header>
-      <main className="flex-1 p-4 md:p-6 space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredChats.map((chat) => (
-            <Card key={chat.id} className="group relative overflow-hidden">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-2">{chat.name}</h3>
-                <p className="text-sm text-gray-500 mb-4 line-clamp-2">
-                  {chat.lastMessage}
-                </p>
-                <div className="flex justify-between text-sm text-gray-400">
-                  <span>{chat.participants} participants</span>
-                  <span>{chat.messages} messages</span>
-                </div>
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => handleDeleteClick(chat.id, chat.name)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <Link href={`/dashboard/chats/${chat.id}`} key={chat.id}>
+              <Card className="h-full hover:shadow-lg transition-shadow duration-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-xl font-bold ${chat.color}`}
+                    >
+                      {chat.name[0]}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {chat.name}
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {chat.participants} participants
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                    {chat.lastMessage}
+                  </p>
+                  <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+                    <span>{chat.messages} messages</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900 dark:hover:text-red-400"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleDeleteClick(chat.id, chat.name);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </main>
-      <footer className="border-t py-4 px-6 text-center text-sm text-gray-500">
-        © 2023 ChatArchiver. All rights reserved.
+      <footer className="bg-white dark:bg-gray-800 shadow-md mt-8">
+        <div className="container mx-auto px-4 py-6 text-center text-sm text-gray-600 dark:text-gray-400">
+          © 2023 ChatArchiver. All rights reserved.
+        </div>
       </footer>
       <DeleteChatDialog
         isOpen={deleteDialogOpen}
