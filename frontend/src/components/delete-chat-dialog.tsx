@@ -28,7 +28,7 @@ export function DeleteChatDialog({
           <DialogTitle>Are you sure you want to delete this chat?</DialogTitle>
           <DialogDescription>
             This action cannot be undone. This will permanently delete the chat
-            "{chatName}" and remove all of its data from our servers.
+            &quot;{chatName}&quot; and remove all of its data from our servers.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
