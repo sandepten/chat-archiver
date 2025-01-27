@@ -1,7 +1,7 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
@@ -18,19 +18,38 @@ import {
  */
 export const createTable = pgTableCreator((name) => `chat-archiver_${name}`);
 
-export const posts = createTable(
-  "post",
-  {
-    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    name: varchar("name", { length: 256 }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date()
-    ),
-  },
-  (example) => ({
-    nameIndex: index("name_idx").on(example.name),
-  })
-);
+export const users = createTable("user", {
+  id: varchar("id").primaryKey(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+  chats: many(chats),
+}));
+
+export const chats = createTable("chat", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  name: varchar("name", { length: 256 }),
+  participants: integer("participants"),
+  messages: integer("messages"),
+  color: varchar("color", { length: 7 }),
+  userId: varchar("user_id"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
+export const chatRelations = relations(chats, ({ one }) => ({
+  author: one(users, {
+    fields: [chats.userId],
+    references: [users.id],
+  }),
+}));
