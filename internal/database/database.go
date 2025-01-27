@@ -11,7 +11,7 @@ import (
 // Service represents a service that interacts with a database.
 type Service interface {
 	// AddUser adds a new user to the database.
-	AddUser(user User) error
+	AddUser(userId string) error
 
 	// GetChats fetches all chats for a given user ID.
 	GetChats(userID int) ([]Chat, error)

@@ -18,8 +18,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	}))
 
 	r.GET("/", s.HelloWorldHandler)
-
-	r.GET("/health", s.healthHandler)
+	r.POST("/users", s.CreateUserHandler)
 
 	return r
 }
@@ -29,8 +28,4 @@ func (s *Server) HelloWorldHandler(c *gin.Context) {
 	resp["message"] = "Hello Sandeep"
 
 	c.JSON(http.StatusOK, resp)
-}
-
-func (s *Server) healthHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, s.db.Health())
 }

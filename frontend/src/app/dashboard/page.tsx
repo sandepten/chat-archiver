@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Search, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DeleteChatDialog } from "@/components/delete-chat-dialog";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@clerk/nextjs";
 
 // Mock data for chats
 const mockChats = [
@@ -62,6 +64,7 @@ const mockChats = [
 ];
 
 export default function Dashboard() {
+  const { userId, isLoaded } = useAuth();
   const [chats, setChats] = useState(mockChats);
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -89,8 +92,27 @@ export default function Dashboard() {
 
   const handleImport = () => {
     // Placeholder for import functionality
-    alert("Import functionality to be implemented");
+    // alert("Import functionality to be implemented");
+    if (isLoaded) {
+      createUserMutation.mutate(userId ?? "");
+    }
   };
+
+  const createUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_id: userId }),
+      });
+      return data.json();
+    },
+    onSuccess: () => {
+      console.log("User created successfully");
+    },
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
