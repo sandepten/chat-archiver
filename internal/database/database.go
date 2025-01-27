@@ -13,8 +13,11 @@ type Service interface {
 	// AddUser adds a new user to the database.
 	AddUser(userId string) error
 
+	// AddChat adds a new chat to the database.
+	AddChat(userID string, name, lastMessage string, participants, messages int, color string) error
+
 	// GetChats fetches all chats for a given user ID.
-	GetChats(userID int) ([]Chat, error)
+	GetChats(userID string) ([]Chat, error)
 }
 
 type service struct {
