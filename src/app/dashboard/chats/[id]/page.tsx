@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/trpc/server";
+import { cn, getAvatarColor } from "@/lib/utils";
 
 export default async function ChatPage({
   params,
@@ -53,125 +54,167 @@ export default async function ChatPage({
   };
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white shadow-md dark:bg-gray-800">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4">
-          <div className="flex items-center space-x-4">
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-sm">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+          <div className="flex items-center gap-4">
             <Link href="/dashboard">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <ArrowLeft className="h-6 w-6" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full transition-transform hover:scale-105"
+              >
+                <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <div className="flex items-center space-x-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage
-                  src={chat.participants[0]?.avatar}
-                  alt={chat.name}
-                />
-                <AvatarFallback>{chat.name[0]}</AvatarFallback>
-              </Avatar>
+            <div className="flex items-center gap-3">
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-semibold text-white transition-transform hover:scale-105"
+                style={{ backgroundColor: getAvatarColor(chat.id) }}
+              >
+                {chat.name[0]}
+              </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {chat.name}
-                </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {chat.participants.length} participants
-                </p>
+                <h1 className="text-xl font-semibold">{chat.name}</h1>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Users className="h-3.5 w-3.5" />
+                  <span>{chat.participants.length} participants</span>
+                </div>
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Badge variant="secondary" className="text-xs">
-              <Calendar className="mr-1 h-3 w-3" />
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="gap-1.5 text-xs">
+              <Calendar className="h-3 w-3" />
               {formatCreationDate(chat.createdAt)}
             </Badge>
-            <Badge variant="secondary" className="text-xs">
-              <MessageSquare className="mr-1 h-3 w-3" />
+            <Badge variant="secondary" className="gap-1.5 text-xs">
+              <MessageSquare className="h-3 w-3" />
               {chat.totalMessages} messages
             </Badge>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full transition-transform hover:scale-105"
+                >
                   <Users className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Participants</DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                  Chat Participants
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {chat.participants.map((participant) => (
-                  <DropdownMenuItem key={participant.id}>
-                    <Avatar className="mr-2 h-6 w-6">
-                      <AvatarImage
-                        src={participant.avatar}
-                        alt={participant.name}
-                      />
-                      <AvatarFallback>{participant.name[0]}</AvatarFallback>
-                    </Avatar>
-                    {participant.name}
+                  <DropdownMenuItem key={participant.id} className="gap-2">
+                    <div
+                      className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium text-white"
+                      style={{ backgroundColor: participant.color ?? "#000" }}
+                    >
+                      {participant.name[0]}
+                    </div>
+                    <span className="text-sm">{participant.name}</span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full transition-transform hover:scale-105"
+            >
               <Download className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Chat Messages */}
-      <ScrollArea className="flex-grow p-4">
-        <div className="mx-auto max-w-3xl space-y-4">
-          {chat.messages.map((message, index) => (
-            <div
-              key={message.id}
-              className={`flex ${message.sender === "You" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`flex max-w-[70%] items-end space-x-2 ${message.sender === "You" ? "flex-row-reverse space-x-reverse" : ""}`}
-              >
-                {index === 0 ||
-                chat.messages[index - 1]?.sender !== message.sender ? (
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={
-                        chat.participants.find((p) => p.name === message.sender)
-                          ?.avatar
-                      }
-                    />
-                    <AvatarFallback>{message.sender[0]}</AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <div className="w-8" /> // Placeholder for alignment
-                )}
+      <ScrollArea className="flex-1">
+        <div className="container mx-auto max-w-4xl px-4 py-8">
+          <div className="space-y-4">
+            {chat.messages.map((message, index) => {
+              const isFirstInGroup =
+                index === 0 ||
+                chat.messages[index - 1]?.sender !== message.sender;
+              const isSentByMe = message.sender === "You";
+              const nextIsDifferentSender =
+                index === chat.messages.length - 1 ||
+                chat.messages[index + 1]?.sender !== message.sender;
+
+              return (
                 <div
-                  className={`rounded-lg p-3 ${
-                    message.sender === "You"
-                      ? "bg-blue-500 text-white"
-                      : "border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
-                  }`}
+                  key={message.id}
+                  className={cn(
+                    "flex",
+                    isSentByMe ? "justify-end" : "justify-start",
+                  )}
                 >
-                  {index === 0 ||
-                  chat.messages[index - 1]?.sender !== message.sender ? (
-                    <p className="mb-1 text-xs font-medium">{message.sender}</p>
-                  ) : null}
-                  <p className="text-sm">{message.content}</p>
-                  <p className="mt-1 text-right text-xs opacity-70">
-                    {formatDate(message.timestamp)}
-                  </p>
+                  <div
+                    className={cn(
+                      "group flex max-w-[80%] items-end gap-2",
+                      isSentByMe ? "flex-row-reverse" : "flex-row",
+                    )}
+                  >
+                    {isFirstInGroup ? (
+                      <div
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium text-white shadow-sm transition-transform group-hover:scale-110"
+                        style={{
+                          backgroundColor: isSentByMe
+                            ? getAvatarColor("you")
+                            : getAvatarColor(message.sender),
+                        }}
+                      >
+                        {message.sender[0]}
+                      </div>
+                    ) : (
+                      <div className="w-8" />
+                    )}
+                    <div
+                      className={cn(
+                        "overflow-hidden rounded-2xl px-4 py-2.5 shadow-sm transition-shadow hover:shadow-md",
+                        isSentByMe
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card",
+                        isFirstInGroup &&
+                          (isSentByMe ? "rounded-br-lg" : "rounded-bl-lg"),
+                        nextIsDifferentSender &&
+                          (isSentByMe ? "rounded-tr-lg" : "rounded-tl-lg"),
+                        !isFirstInGroup &&
+                          !nextIsDifferentSender &&
+                          "rounded-3xl",
+                      )}
+                    >
+                      {isFirstInGroup && (
+                        <p className="mb-1 text-xs font-medium opacity-75">
+                          {message.sender}
+                        </p>
+                      )}
+                      <p className="text-sm leading-relaxed">
+                        {message.content}
+                      </p>
+                      <p className="mt-1 text-right text-[10px] tracking-wide opacity-50">
+                        {formatDate(message.timestamp)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
-          {/* <div ref={messagesEndRef} /> */}
+              );
+            })}
+          </div>
         </div>
       </ScrollArea>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white py-4 dark:border-gray-700 dark:bg-gray-800">
-        <div className="container mx-auto px-4 text-center text-sm text-gray-600 dark:text-gray-400">
-          This is an archived chat. No new messages can be sent.
+      <footer className="border-t bg-background/80 backdrop-blur-sm">
+        <div className="container mx-auto flex items-center justify-between px-4 py-3">
+          <p className="text-sm text-muted-foreground">
+            This is an archived chat. Messages are read-only.
+          </p>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Download className="h-4 w-4" />
+            Export Chat
+          </Button>
         </div>
       </footer>
     </div>
