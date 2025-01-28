@@ -67,6 +67,7 @@ export const chatRouter = createTRPCRouter({
         })),
         createdAt: chat.createdAt.toISOString(),
         totalMessages: chat.messages?.length ?? 0,
+        color: chat.color,
       };
     }),
 

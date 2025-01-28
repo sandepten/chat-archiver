@@ -2,17 +2,26 @@
 
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 const ChatSearch = () => {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400" />
+      <Search
+        className={cn(
+          "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform transition-colors duration-200",
+          isFocused ? "text-primary" : "text-muted-foreground",
+        )}
+      />
       <Input
         type="search"
         placeholder="Search chats..."
-        className="w-64 pl-10"
-        // value={searchTerm}
-        // onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-72 pl-10 pr-4 transition-all duration-200 focus:w-96"
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       />
     </div>
   );
