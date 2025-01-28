@@ -34,10 +34,11 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const chats = createTable("chat", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  name: varchar("name", { length: 256 }),
-  participants: integer("participants"),
+  name: varchar("name", { length: 256 }).notNull(),
+  participants: integer("participants").notNull(),
   messages: integer("messages"),
   color: varchar("color", { length: 7 }),
+  lastMessage: varchar("last_message", { length: 256 }),
   userId: varchar("user_id"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)

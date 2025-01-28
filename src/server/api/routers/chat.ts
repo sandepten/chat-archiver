@@ -1,25 +1,10 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-// import { posts } from "@/server/db/schema";
+import { chats } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 
 export const chatRouter = createTRPCRouter({
-  // hello: publicProcedure
-  //   .input(z.object({ text: z.string() }))
-  //   .query(({ input }) => {
-  //     return {
-  //       greeting: `Hello ${input.text}`,
-  //     };
-  //   }),
-  //
-  // create: publicProcedure
-  //   .input(z.object({ name: z.string().min(1) }))
-  //   .mutation(async ({ ctx, input }) => {
-  //     await ctx.db.insert(posts).values({
-  //       name: input.name,
-  //     });
-  //   }),
-  //
   // getLatest: publicProcedure.query(async ({ ctx }) => {
   //   const post = await ctx.db.query.posts.findFirst({
   //     orderBy: (posts, { desc }) => [desc(posts.createdAt)],
@@ -28,7 +13,7 @@ export const chatRouter = createTRPCRouter({
   //   return post ?? null;
   // }),
 
-  getAll: publicProcedure.query(async ({ ctx }) => {
+  getAllMock: publicProcedure.query(async ({ ctx }) => {
     const mockChats = [
       {
         id: 1,
@@ -81,4 +66,53 @@ export const chatRouter = createTRPCRouter({
     ];
     return mockChats;
   }),
+
+  getAll: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      return await ctx.db.query.chats.findMany({
+        where: eq(chats.userId, input.userId),
+        orderBy: (chats, { desc }) => [desc(chats.id)],
+      });
+    }),
+
+  getById: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.query.chats.findFirst({
+        where: eq(chats.id, input.id),
+      });
+    }),
+
+  create: publicProcedure
+    .input(
+      z.object({
+        name: z.string().min(1),
+        lastMessage: z.string().min(1),
+        participants: z.number(),
+        messages: z.number(),
+        color: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.insert(chats).values({
+        name: input.name,
+        color: input.color,
+        messages: input.messages,
+        participants: input.participants,
+        lastMessage: input.lastMessage,
+      });
+    }),
+
+  deleteById: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.delete(chats).where(eq(chats.id, input.id));
+    }),
 });

@@ -5,22 +5,11 @@ import Link from "next/link";
 import { api } from "@/trpc/server";
 import ChatCard from "@/components/chat-card";
 import ChatSearch from "@/components/chat-search";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function Dashboard() {
-  const chats = await api.chat.getAll();
-
-  // const handleDeleteClick = (id: number, name: string) => {
-  //   setChatToDelete({ id, name });
-  //   setDeleteDialogOpen(true);
-  // };
-  //
-  // const handleDeleteConfirm = () => {
-  //   if (chatToDelete) {
-  //     setChats(chats.filter((chat) => chat.id !== chatToDelete.id));
-  //     setDeleteDialogOpen(false);
-  //     setChatToDelete(null);
-  //   }
-  // };
+  const { userId } = await auth();
+  const chats = await api.chat.getAll({ userId: userId ?? "" });
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-100 dark:bg-gray-900">
