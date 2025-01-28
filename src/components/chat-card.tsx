@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import type { chats } from "@/server/db/schema";
@@ -13,7 +11,7 @@ const ChatCard = (chat: typeof chats.$inferSelect) => {
           <div className="mb-4 flex items-center space-x-4">
             <div
               className={`flex h-12 w-12 items-center justify-center rounded-full text-xl font-bold text-white`}
-              style={{ backgroundColor: "#" + chat.color }}
+              style={{ backgroundColor: chat.color ?? "#000" }}
             >
               {chat.name[0]}
             </div>
