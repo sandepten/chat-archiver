@@ -6,6 +6,7 @@ import { api } from "@/trpc/server";
 import ChatCard from "@/components/chat-card";
 import ChatSearch from "@/components/chat-search";
 import { auth } from "@clerk/nextjs/server";
+import { UploadChatDialog } from "@/components/upload-chat-dialog";
 
 export default async function Dashboard() {
   const { userId } = await auth();
@@ -25,9 +26,7 @@ export default async function Dashboard() {
           </div>
           <div className="flex items-center space-x-4">
             <ChatSearch />
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Import Chat
-            </Button>
+            <UploadChatDialog />
             <SignedIn>
               <UserButton />
             </SignedIn>
