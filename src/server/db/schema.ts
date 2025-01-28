@@ -8,6 +8,7 @@ import {
   pgTableCreator,
   text,
   timestamp,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { table } from "node:console";
@@ -35,7 +36,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export const chats = createTable("chat", {
-  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 256 }).notNull(),
   participants: integer("participants").notNull(),
   messages: integer("messages"),
@@ -60,7 +61,7 @@ export const chatRelations = relations(chats, ({ one, many }) => ({
 
 export const messages = createTable("message", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  chatId: integer("chat_id").notNull(),
+  chatId: uuid("chat_id").notNull(),
   user: varchar("user").notNull(),
   content: text("content").notNull(),
   timestamp: timestamp("timestamp", { withTimezone: true }).notNull(),

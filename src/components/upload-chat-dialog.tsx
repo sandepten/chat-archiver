@@ -26,6 +26,9 @@ import {
 import { HexColorPicker } from "react-colorful";
 import { Upload, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { parseWhatsAppChat } from "@/lib/parse-chat";
+import { api } from "@/trpc/react";
+import { useAuth } from "@clerk/nextjs";
 
 const formSchema = z.object({
   name: z.string().min(1, "Chat name is required"),
@@ -35,6 +38,9 @@ const formSchema = z.object({
 
 export function UploadChatDialog() {
   const [open, setOpen] = useState(false);
+  const createChatMutation = api.chat.create.useMutation();
+  const utils = api.useUtils();
+  const { isLoaded, userId } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,15 +50,21 @@ export function UploadChatDialog() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // onUpload({
-    //   name: values.name,
-    //   color: values.color,
-    //   file: values.file,
-    // });
-    console.log(values);
-    setOpen(false);
-    form.reset();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const messages = await parseWhatsAppChat(values.file);
+      await createChatMutation.mutateAsync({
+        userId: userId ?? "",
+        name: values.name,
+        color: values.color,
+        messages,
+      });
+      await utils.chat.getAll.refetch({ userId: userId ?? "" });
+      setOpen(false);
+      form.reset();
+    } catch (error) {
+      console.error("Error parsing chat:", error);
+    }
   }
 
   return (
@@ -173,7 +185,7 @@ export function UploadChatDialog() {
                           id="dropzone-file"
                           type="file"
                           className="hidden"
-                          accept=".json"
+                          accept=".json,.txt"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) onChange(file);
@@ -196,7 +208,11 @@ export function UploadChatDialog() {
               >
                 Cancel
               </Button>
-              <Button type="submit" className="flex-1">
+              <Button
+                type="submit"
+                className="flex-1"
+                disabled={createChatMutation.isPending || !isLoaded}
+              >
                 Upload Chat
               </Button>
             </DialogFooter>

@@ -1,7 +1,3 @@
-"use client";
-
-import { useState, useRef, useEffect } from "react";
-import { useParams } from "next/navigation";
 import {
   ArrowLeft,
   Calendar,
@@ -23,86 +19,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { api } from "@/trpc/server";
 
-// Mock data for the chat
-const mockChat = {
-  id: "1",
-  name: "Family Group",
-  participants: [
-    { id: "1", name: "You", avatar: "/placeholder.svg?height=32&width=32" },
-    { id: "2", name: "Mom", avatar: "/placeholder.svg?height=32&width=32" },
-    { id: "3", name: "Dad", avatar: "/placeholder.svg?height=32&width=32" },
-    { id: "4", name: "Sister", avatar: "/placeholder.svg?height=32&width=32" },
-  ],
-  messages: [
-    {
-      id: "1",
-      sender: "Mom",
-      content: "Hey everyone! Are we still on for the picnic this Sunday?",
-      timestamp: "2023-06-10T10:30:00Z",
-    },
-    {
-      id: "2",
-      sender: "Dad",
-      content: "Yes, I've already packed the grill!",
-      timestamp: "2023-06-10T10:35:00Z",
-    },
-    {
-      id: "3",
-      sender: "Sister",
-      content: "I'll bring some games we can play!",
-      timestamp: "2023-06-10T10:40:00Z",
-    },
-    {
-      id: "4",
-      sender: "You",
-      content: "Sounds great! I'll take care of the drinks and snacks.",
-      timestamp: "2023-06-10T10:45:00Z",
-    },
-    {
-      id: "5",
-      sender: "Mom",
-      content:
-        "Perfect! Don't forget to bring sunscreen, it's going to be sunny.",
-      timestamp: "2023-06-10T10:50:00Z",
-    },
-    {
-      id: "6",
-      sender: "Dad",
-      content: "I'll bring some extra chairs just in case.",
-      timestamp: "2023-06-10T11:00:00Z",
-    },
-    {
-      id: "7",
-      sender: "Sister",
-      content: "Can we invite Aunt Sarah and her kids too?",
-      timestamp: "2023-06-10T11:05:00Z",
-    },
-    {
-      id: "8",
-      sender: "Mom",
-      content: "That's a great idea! I'll give her a call.",
-      timestamp: "2023-06-10T11:10:00Z",
-    },
-    {
-      id: "9",
-      sender: "You",
-      content: "Awesome! This is going to be so much fun!",
-      timestamp: "2023-06-10T11:15:00Z",
-    },
-  ],
-  createdAt: "2023-06-01T09:00:00Z",
-  totalMessages: 1893,
-};
-
-export default function ChatPage() {
-  const { id } = useParams();
-  const [chat, setChat] = useState(mockChat);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chat.messages]);
+export default async function ChatPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const chatId = (await params).id;
+  const chat = await api.chat.getWithMessages({ chatId });
+  if (!chat) {
+    return <div>Chat not found</div>;
+  }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -236,7 +164,7 @@ export default function ChatPage() {
               </div>
             </div>
           ))}
-          <div ref={messagesEndRef} />
+          {/* <div ref={messagesEndRef} /> */}
         </div>
       </ScrollArea>
 

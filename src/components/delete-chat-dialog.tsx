@@ -14,7 +14,7 @@ import { useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
 
 interface DeleteChatDialogProps {
-  id: number;
+  id: string;
   chatName: string;
 }
 
