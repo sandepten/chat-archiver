@@ -21,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/trpc/server";
 import { cn, getAvatarColor } from "@/lib/utils";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function ChatPage({
   params,
@@ -28,10 +29,16 @@ export default async function ChatPage({
   params: Promise<{ id: string }>;
 }) {
   const chatId = (await params).id;
+  const { userId } = await auth();
   const chat = await api.chat.getWithMessages({ chatId });
+  const userSettings = await api.user.getSettings({ userId: userId ?? "" });
+
   if (!chat) {
     return <div>Chat not found</div>;
   }
+
+  const usernames =
+    userSettings?.usernames?.split(",").map((name) => name.trim()) ?? [];
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -51,6 +58,12 @@ export default async function ChatPage({
       month: "long",
       day: "numeric",
     });
+  };
+
+  const isMessageFromUser = (sender: string) => {
+    return usernames.some(
+      (username) => username.toLowerCase() === sender.toLowerCase(),
+    );
   };
 
   return (
@@ -111,7 +124,9 @@ export default async function ChatPage({
                   <DropdownMenuItem key={participant.id} className="gap-2">
                     <div
                       className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium text-white"
-                      style={{ backgroundColor: participant.color ?? "#000" }}
+                      style={{
+                        backgroundColor: getAvatarColor(participant.name),
+                      }}
                     >
                       {participant.name[0]}
                     </div>
@@ -138,7 +153,7 @@ export default async function ChatPage({
               const isFirstInGroup =
                 index === 0 ||
                 chat.messages[index - 1]?.sender !== message.sender;
-              const isSentByMe = message.sender === "You";
+              const isSentByMe = isMessageFromUser(message.sender);
               const nextIsDifferentSender =
                 index === chat.messages.length - 1 ||
                 chat.messages[index + 1]?.sender !== message.sender;
@@ -176,7 +191,7 @@ export default async function ChatPage({
                         "overflow-hidden rounded-2xl px-4 py-2.5 shadow-sm transition-shadow hover:shadow-md",
                         isSentByMe
                           ? "bg-primary text-primary-foreground"
-                          : "bg-card",
+                          : "bg-secondary",
                         isFirstInGroup &&
                           (isSentByMe ? "rounded-br-lg" : "rounded-bl-lg"),
                         nextIsDifferentSender &&
@@ -211,10 +226,10 @@ export default async function ChatPage({
           <p className="text-sm text-muted-foreground">
             This is an archived chat. Messages are read-only.
           </p>
-          <Button variant="outline" size="sm" className="gap-2">
+          {/* <Button variant="outline" size="sm" className="gap-2">
             <Download className="h-4 w-4" />
             Export Chat
-          </Button>
+          </Button> */}
         </div>
       </footer>
     </div>
