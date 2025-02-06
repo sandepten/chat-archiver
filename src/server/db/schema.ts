@@ -23,6 +23,7 @@ export const createTable = pgTableCreator((name) => `chat-archiver_${name}`);
 
 export const users = createTable("user", {
   id: varchar("id").primaryKey(),
+  username: varchar("username"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
