@@ -7,6 +7,7 @@ import ChatCard from "@/components/chat-card";
 import ChatSearch from "@/components/chat-search";
 import { auth } from "@clerk/nextjs/server";
 import { UploadChatDialog } from "@/components/upload-chat-dialog";
+import { SettingsDialog } from "@/components/settings-dialog";
 
 export default async function Dashboard() {
   const { userId } = await auth();
@@ -25,6 +26,7 @@ export default async function Dashboard() {
           <div className="flex items-center gap-x-4">
             <ChatSearch />
             <UploadChatDialog />
+            <SettingsDialog />
             <SignedIn>
               <UserButton afterSignOutUrl="/" />
             </SignedIn>
