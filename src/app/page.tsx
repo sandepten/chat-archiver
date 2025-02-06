@@ -11,7 +11,7 @@ export default function LandingPage() {
           <MessageSquare className="mr-2 h-7 w-7 text-primary" />
           <span className="text-2xl font-bold">ChatArchiver</span>
         </Link>
-        <nav className="ml-auto flex gap-8">
+        <nav className="ml-auto flex items-center gap-8">
           <Link
             className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
             href="#features"
