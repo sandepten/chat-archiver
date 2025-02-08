@@ -116,8 +116,8 @@ export function SettingsDialog() {
               className="h-12"
             />
             <p className="text-xs text-muted-foreground">
-              Example: If you appear as "John" in some chats and "John Doe" in
-              others, add both names.
+              Example: If you appear as &quot;John&quot; in some chats and
+              &quot;John Doe&quot; in others, add both names.
             </p>
           </div>
         </div>
